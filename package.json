@@ -1,0 +1,23 @@
+{
+  "dependencies": {
+    "@create-figma-plugin/utilities": "^2.6.1"
+  },
+  "devDependencies": {
+    "@create-figma-plugin/build": "^2.6.1",
+    "@create-figma-plugin/tsconfig": "^2.6.1",
+    "@figma/plugin-typings": "1.74.0",
+    "typescript": ">=4"
+  },
+  "scripts": {
+    "build": "build-figma-plugin --typecheck --minify",
+    "watch": "build-figma-plugin --typecheck --watch"
+  },
+  "figma-plugin": {
+    "editorType": [
+      "figma"
+    ],
+    "id": "typist",
+    "name": "Typist",
+    "main": "src/main.ts"
+  }
+}

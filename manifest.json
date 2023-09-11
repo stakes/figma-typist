@@ -1,0 +1,9 @@
+{
+  "api": "1.0.0",
+  "editorType": [
+    "figma"
+  ],
+  "id": "typist",
+  "name": "Typist",
+  "main": "build/main.js"
+}
