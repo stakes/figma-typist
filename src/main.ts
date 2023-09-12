@@ -1,10 +1,32 @@
-import {
-  formatErrorMessage,
-  formatSuccessMessage
-} from '@create-figma-plugin/utilities'
+import { cloneObject, formatErrorMessage, formatSuccessMessage } from '@create-figma-plugin/utilities';
 
-// thanks to https://github.com/yuanqing/figma-plugins for helping start this off
+let reactionsTemplate = {
+  "action": {
+    "type": "NODE",
+    "destinationId": "17:23",
+    "navigation": "CHANGE_TO",
+    "transition": null,
+    "resetVideoPosition": false
+  },
+  "actions": [
+    {
+      "type": "NODE",
+      "destinationId": "17:23",
+      "navigation": "CHANGE_TO",
+      "transition": null,
+      "resetVideoPosition": false
+    }
+  ],
+  "trigger": {
+    "type": "AFTER_TIMEOUT",
+    "timeout": 0.030
+  }
+}
+
 export default async function (): Promise<void> {
+  // thanks to https://github.com/yuanqing/figma-plugins for helping start this off
+  // if there's no selection, show an error message
+  // if the selection isn't text, also show an error message
   if (figma.currentPage.selection.length === 0) {
     figma.closePlugin(formatErrorMessage('Select one or more text layers'))
     return
@@ -17,7 +39,7 @@ export default async function (): Promise<void> {
     return
   }
 
-  let components:ComponentNode[] = []
+  let components: ComponentNode[] = []
 
   for (const node of nodes) {
     const newComponents = await createVariantComponents(node)
@@ -26,9 +48,32 @@ export default async function (): Promise<void> {
   const bigComponent = figma.combineAsVariants(components, figma.currentPage)
   bigComponent.layoutMode = 'VERTICAL'
 
+  for (let i = 0; i < bigComponent.children.length-1; i++) {
+    const child = bigComponent.children[i];
+    const nextChild = bigComponent.children[i+1];
+    if (child && child.type === 'COMPONENT') {
+      let newReactions = cloneObject(child.reactions) as Reaction[]
+      newReactions[0] = {action: null, trigger: null}
+      if (newReactions) {
+        newReactions[0].action = {
+          type: "NODE",
+          destinationId: nextChild.id,
+          navigation: "CHANGE_TO",
+          transition: null,
+          resetVideoPosition: false
+        } 
+        newReactions[0].trigger = {
+          type: "AFTER_TIMEOUT",
+          timeout: 0.030
+        }
+      }
+      child.reactions = newReactions
+    }
+  }
+
   figma.closePlugin(
     formatSuccessMessage(
-      `DONE!`
+      `Created a new component with ${components.length} variants`
     )
   )
 }
@@ -38,7 +83,7 @@ async function createVariantComponents(node: TextNode) {
   for (const fontName of fontNames) {
     await figma.loadFontAsync(fontName)
   }
-  
+
   const words = node.characters.split(' ')
   let newComponents = []
   for (let i = 0; i < words.length; i++) {
