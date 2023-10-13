@@ -1,13 +1,6 @@
 import { cloneObject, formatErrorMessage, formatSuccessMessage } from '@create-figma-plugin/utilities';
 
 let reactionsTemplate = {
-  "action": {
-    "type": "NODE",
-    "destinationId": "17:23",
-    "navigation": "CHANGE_TO",
-    "transition": null,
-    "resetVideoPosition": false
-  },
   "actions": [
     {
       "type": "NODE",
@@ -41,27 +34,30 @@ export default async function (): Promise<void> {
 
   let components: ComponentNode[] = []
 
-  for (const node of nodes) {
-    const newComponents = await createVariantComponents(node)
-    components.push(...newComponents)
-  }
+  // for (const node of nodes) {
+  const newComponents = await createVariantComponents(nodes[0])
+  components.push(...newComponents)
+  // }
+
   const bigComponent = figma.combineAsVariants(components, figma.currentPage)
   bigComponent.layoutMode = 'VERTICAL'
+  bigComponent.x = nodes[0].x + nodes[0].width + 100
+  bigComponent.y = nodes[0].y
 
   for (let i = 0; i < bigComponent.children.length-1; i++) {
     const child = bigComponent.children[i];
     const nextChild = bigComponent.children[i+1];
     if (child && child.type === 'COMPONENT') {
-      let newReactions = cloneObject(child.reactions) as Reaction[]
-      newReactions[0] = {action: null, trigger: null}
+      let newReactions = cloneObject(child.reactions) as any
+      newReactions[0] = {actions: null, trigger: null}
       if (newReactions) {
-        newReactions[0].action = {
+        newReactions[0].actions = [{
           type: "NODE",
           destinationId: nextChild.id,
           navigation: "CHANGE_TO",
           transition: null,
           resetVideoPosition: false
-        } 
+        }]
         newReactions[0].trigger = {
           type: "AFTER_TIMEOUT",
           timeout: 0.030
