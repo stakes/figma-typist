@@ -7,14 +7,14 @@ import { useState } from 'preact/hooks'
  
 function Plugin (props: { greeting: string }) {
     function handleClick() {
-        const data = { greeting: 'Hello, World!' }
+        const data = { value: value }
         emit('CREATECOMPONENT', data)
     }
     const [value, setValue] = useState<string>('Word');
     const options: Array<SegmentedControlOption> = [{
-        value: 'Word'
-    }, {
         value: 'Chunk'
+    }, {
+        value: 'Word'
     }, {
         value: 'Letter'
     }];

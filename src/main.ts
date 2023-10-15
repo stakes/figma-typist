@@ -7,11 +7,8 @@ export default async function (): Promise<void> {
   const data = { greeting: 'Hello, World!' }
   showUI(options, data)
 
-  function handleCreateTextComponent(data) {
-    console.log(data) //=> { greeting: 'Hello, World!' }
-  }
+  async function handleCreateComponent(data:any) {
 
-  async function handleCreateComponent(data) {
     // thanks to https://github.com/yuanqing/figma-plugins for helping start this off
     // if there's no selection, show an error message
     // if the selection isn't text, also show an error message
@@ -31,7 +28,7 @@ export default async function (): Promise<void> {
     
     for (const node of nodes) {
       let components: ComponentNode[] = []
-      const newComponents = await createVariantComponents(node)
+      const newComponents = await createVariantComponents(node, data)
       components.push(...newComponents)
 
       const bigComponent = figma.combineAsVariants(components, figma.currentPage)
@@ -77,19 +74,32 @@ export default async function (): Promise<void> {
 
 }
 
-async function createVariantComponents(node: TextNode) {
+async function createVariantComponents(node: TextNode, data: any) {
   const fontNames = node.getRangeAllFontNames(0, node.characters.length)
   for (const fontName of fontNames) {
     await figma.loadFontAsync(fontName)
   }
 
-  const words = node.characters.split(' ')
+  let words: string[] = []
+  if (data.value == "Word") {
+    words = node.characters.split(' ')
+  } else if (data.value == "Letter") {
+    words = node.characters.split('')
+  } else if (data.value == "Chunk") {
+    words = node.characters.split(' ')
+    words = splitIntoChunks(words)
+    console.log(words)
+  }
   let newComponents = []
   for (let i = 0; i < words.length; i++) {
     let newNode = node.clone()
     newNode.resize(node.width, node.height)
     newNode.textAutoResize = 'HEIGHT'
-    newNode.characters = words.slice(0, i + 1).join(' ')
+    if (data.value == "Word" || data.value == "Chunk") {
+      newNode.characters = words.slice(0, i + 1).join(' ')
+    } else if (data.value == "Letter") {
+      newNode.characters = words.slice(0, i + 1).join('')
+    }
     newNode.x = 0
     newNode.y = 0
     const component = figma.createComponent()
@@ -98,4 +108,20 @@ async function createVariantComponents(node: TextNode) {
     newComponents.push(component)
   }
   return newComponents
+}
+
+function splitIntoChunks(words:any) {
+  const chunkSizes = [3, 4, 5]
+  let result = []
+  let currentIndex = 0
+  while (currentIndex < words.length) {
+    const randomIndex = Math.floor(Math.random() * chunkSizes.length)
+    const chunkSize = chunkSizes[randomIndex]
+    const chunk = words.slice(currentIndex, currentIndex + chunkSize)
+    if (chunk.length > 0) {
+        result.push(chunk.join(' '))
+    }
+    currentIndex += chunkSize;
+}
+  return result
 }
