@@ -2,10 +2,9 @@ import { cloneObject, formatErrorMessage, formatSuccessMessage, showUI, once } f
 
 export default async function (): Promise<void> {
 
-
-  const options = { width: 240, height: 120 }
-  const data = { greeting: 'Hello, World!' }
-  showUI(options, data)
+  const options = { width: 240, height: 380 }
+  // const data = { greeting: 'Hello, World!' }
+  showUI(options)
 
   async function handleCreateComponent(data:any) {
 
@@ -39,6 +38,7 @@ export default async function (): Promise<void> {
       for (let i = 0; i < bigComponent.children.length-1; i++) {
         const child = bigComponent.children[i];
         const nextChild = bigComponent.children[i+1];
+        console.log(child, nextChild)
         if (child && child.type === 'COMPONENT') {
           let newReactions = cloneObject(child.reactions) as any
           newReactions[0] = {actions: null, trigger: null}
@@ -75,29 +75,28 @@ export default async function (): Promise<void> {
 }
 
 async function createVariantComponents(node: TextNode, data: any) {
+  console.log(data)
   const fontNames = node.getRangeAllFontNames(0, node.characters.length)
   for (const fontName of fontNames) {
     await figma.loadFontAsync(fontName)
   }
-
   let words: string[] = []
-  if (data.value == "Word") {
+  if (data.type == "word") {
     words = node.characters.split(' ')
-  } else if (data.value == "Letter") {
+  } else if (data.type == "letter") {
     words = node.characters.split('')
-  } else if (data.value == "Chunk") {
+  } else if (data.type == "chunk") {
     words = node.characters.split(' ')
     words = splitIntoChunks(words)
-    console.log(words)
   }
   let newComponents = []
   for (let i = 0; i < words.length; i++) {
     let newNode = node.clone()
     newNode.resize(node.width, node.height)
     newNode.textAutoResize = 'HEIGHT'
-    if (data.value == "Word" || data.value == "Chunk") {
+    if (data.type == "word" || data.type == "chunk") {
       newNode.characters = words.slice(0, i + 1).join(' ')
-    } else if (data.value == "Letter") {
+    } else if (data.type == "letter") {
       newNode.characters = words.slice(0, i + 1).join('')
     }
     newNode.x = 0

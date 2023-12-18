@@ -1,40 +1,76 @@
 // src/ui.tsx
  
-import { render, Container, Text, VerticalSpace, Button, SegmentedControl, SegmentedControlOption, Divider } from '@create-figma-plugin/ui'
+import { render, Container, Text, Muted, VerticalSpace, Button, RadioButtons, RadioButtonsOption, Divider, RangeSlider, Toggle } from '@create-figma-plugin/ui'
 import { emit } from '@create-figma-plugin/utilities'
 import { h } from 'preact'
+import styles from './styles.css'
 import { useState } from 'preact/hooks'
+import { JSX } from 'preact';
  
 function Plugin (props: { greeting: string }) {
     function handleClick() {
-        const data = { value: value }
+        const data = { type: typeValue, speed: speedValue, randomize: randValue }
         emit('CREATECOMPONENT', data)
     }
-    const [value, setValue] = useState<string>('Word');
-    const options: Array<SegmentedControlOption> = [{
-        value: 'Chunk'
+    const [typeValue, setTypeValue] = useState<string>('word');
+    const [speedValue, setSpeedValue] = useState<string>(2);
+    const [randValue, setRandValue] = useState<boolean>(false);
+    const options: Array<RadioButtonsOption> = [{
+        children: <Text>Letter</Text>,
+        value: 'letter'
     }, {
-        value: 'Word'
+        children: <Text>Word</Text>,
+        value: 'word'
     }, {
-        value: 'Letter'
+        children: <Text>Multiple Words</Text>,
+        value: 'chunk'
     }];
-    function handleChange(event: JSX.TargetedEvent<HTMLInputElement>) {
+    
+    function handleTypeChange(event: JSX.TargetedEvent<HTMLInputElement>) {
         const newValue = event.currentTarget.value;
-        console.log(newValue);
-        setValue(newValue);
+        setTypeValue(newValue);
     }
+
+    function handleRangeChange(newValue: string) {
+        setSpeedValue(newValue);
+    }
+
+    function handleRandomizeToggle(newValue: boolean) {
+        setRandValue(newValue);
+    }
+
     return (
         <Container space='medium'>
+            <VerticalSpace space='extraLarge' />
+            <Text><Muted>Type by</Muted></Text>
             <VerticalSpace space='medium' />
-            <Text>Create Text Component</Text>
-            <VerticalSpace space='medium' />
-            <SegmentedControl onChange={handleChange} options={options} value={value} />
-            <VerticalSpace space='small' />
-            <Button onClick={handleClick}>Text</Button>
+            <RadioButtons onChange={handleTypeChange} options={options} value={typeValue} space="medium" />
+            <VerticalSpace space='extraLarge' />
             <Divider />
+            <VerticalSpace space='extraLarge' />
+            <Text><Muted>Speed</Muted></Text>
             <VerticalSpace space='medium' />
-            <Text>Loading Spinners</Text>
+            <RangeSlider increment={1} maximum={4} minimum={0} onInput={handleRangeChange} value={speedValue} />
+            <VerticalSpace space='small' />
+            <div class={styles.sliderTextContainer}>
+                <div>
+                    <Text>Slower</Text>
+                </div>
+                <div>
+                    <Text>Faster</Text>
+                </div>
+            </div>
+            <VerticalSpace space='extraLarge' />
+            <Divider />
+            <VerticalSpace space='extraLarge' />
+            <Text><Muted>Randomness</Muted></Text>
             <VerticalSpace space='medium' />
+            <Toggle onValueChange={handleRandomizeToggle} value={randValue}>
+                <Text>Randomize typing speed</Text>
+            </Toggle>
+            <VerticalSpace space='extraLarge' />
+            <VerticalSpace space='extraLarge' />
+            <Button fullWidth onClick={handleClick}>Create component</Button>
         </Container>
     )
 }
