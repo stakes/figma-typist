@@ -13,7 +13,7 @@ function Plugin (props: { greeting: string }) {
         emit('CREATECOMPONENT', data)
     }
     const [typeValue, setTypeValue] = useState<string>('word');
-    const [speedValue, setSpeedValue] = useState<string>(2);
+    const [speedValue, setSpeedValue] = useState<string>('2');
     const [randValue, setRandValue] = useState<boolean>(false);
     const options: Array<RadioButtonsOption> = [{
         children: <Text>Letter</Text>,
@@ -31,13 +31,14 @@ function Plugin (props: { greeting: string }) {
         setTypeValue(newValue);
     }
 
-    function handleRangeChange(newValue: string) {
+    function handleRangeChange(event: JSX.TargetedEvent<HTMLInputElement>) {
+        const newValue = event.currentTarget.value;
         setSpeedValue(newValue);
     }
 
     function handleRandomizeToggle(newValue: boolean) {
         setRandValue(newValue);
-    }
+    } 
 
     return (
         <Container space='medium'>
