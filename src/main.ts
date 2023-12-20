@@ -4,7 +4,7 @@ export default async function (): Promise<void> {
 
   const options = { width: 240, height: 380 }
 
-  const speeds = [0.010, 0.030, 0.050, 0.100, 0.300]
+  const speeds = [0.200, 0.100, 0.050, 0.030, 0.010]
 
   showUI(options)
 

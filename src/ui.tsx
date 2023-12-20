@@ -13,7 +13,7 @@ function Plugin (props: { greeting: string }) {
         emit('CREATECOMPONENT', data)
     }
     const [typeValue, setTypeValue] = useState<string>('word');
-    const [speedValue, setSpeedValue] = useState<string>('2');
+    const [speedValue, setSpeedValue] = useState<string>('3');
     const [randValue, setRandValue] = useState<boolean>(false);
     const options: Array<RadioButtonsOption> = [{
         children: <Text>Letter</Text>,
