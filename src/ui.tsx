@@ -1,6 +1,6 @@
 // src/ui.tsx
  
-import { render, Container, Text, Muted, VerticalSpace, Button, RadioButtons, RadioButtonsOption, Divider, RangeSlider, Toggle, Banner, IconInfo32, IconCheckCircle32 } from '@create-figma-plugin/ui'
+import { render, Container, Text, Muted, VerticalSpace, Button, RadioButtons, RadioButtonsOption, Divider, RangeSlider, Toggle, Banner, IconInfo32, IconCheckCircle32, useInitialFocus } from '@create-figma-plugin/ui'
 import { emit, on } from '@create-figma-plugin/utilities'
 import { h } from 'preact'
 import styles from './styles.css'
@@ -10,7 +10,6 @@ import { JSX } from 'preact';
 function Plugin (props: { greeting: string }) {
 
     function handleClick() {
-        console.log("click")
         const data = { type: typeValue, speed: speedValue, randomize: randValue }
         emit('CREATECOMPONENT', data)
     }
@@ -58,15 +57,15 @@ function Plugin (props: { greeting: string }) {
             
             {selectedTextNodes !== 0 ? (
                 <Banner icon={<IconCheckCircle32 />}>
-                    <Text>Create {selectedTextNodes === 1 ? '1 animated text component' : `${selectedTextNodes} animated text components`}</Text>
+                    <Text>{selectedTextNodes === 1 ? '1 text layer selected' : `${selectedTextNodes} text layers selected`}</Text>
                 </Banner>
             ) : (
-                <Banner icon={<IconInfo32 />}>
+                <Banner style={{backgroundColor: "#F3F3F3"}} icon={<IconInfo32 />}>
                     <Text>Select a text layer to get started</Text>
                 </Banner>
             )}
               
-            <VerticalSpace space='extraLarge' />
+            <VerticalSpace space='extraLarge' class={styles.neutral} />
             <Text><Muted>Type by</Muted></Text>
             <VerticalSpace space='medium' />
             <RadioButtons onChange={handleTypeChange} options={options} value={typeValue} space="medium" />
