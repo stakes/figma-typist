@@ -1,20 +1,24 @@
 // src/ui.tsx
  
-import { render, Container, Text, Muted, VerticalSpace, Button, RadioButtons, RadioButtonsOption, Divider, RangeSlider, Toggle } from '@create-figma-plugin/ui'
-import { emit } from '@create-figma-plugin/utilities'
+import { render, Container, Text, Muted, VerticalSpace, Button, RadioButtons, RadioButtonsOption, Divider, RangeSlider, Toggle, Banner, IconInfo32, IconCheckCircle32 } from '@create-figma-plugin/ui'
+import { emit, on } from '@create-figma-plugin/utilities'
 import { h } from 'preact'
 import styles from './styles.css'
 import { useState } from 'preact/hooks'
 import { JSX } from 'preact';
  
 function Plugin (props: { greeting: string }) {
+
     function handleClick() {
+        console.log("click")
         const data = { type: typeValue, speed: speedValue, randomize: randValue }
         emit('CREATECOMPONENT', data)
     }
     const [typeValue, setTypeValue] = useState<string>('word');
     const [speedValue, setSpeedValue] = useState<string>('3');
     const [randValue, setRandValue] = useState<boolean>(false);
+    const [selectedTextNodes, setSelectedTextNodes] = useState<number>(0);
+
     const options: Array<RadioButtonsOption> = [{
         children: <Text>Letter</Text>,
         value: 'letter'
@@ -40,8 +44,28 @@ function Plugin (props: { greeting: string }) {
         setRandValue(newValue);
     } 
 
+    function handleSelectionChange(data: any) {
+        console.log(data)
+        console.log("cool")
+        setSelectedTextNodes(data)
+    }
+
+    on('SELECTIONCHANGE', handleSelectionChange)
+
     return (
         <Container space='medium'>
+            <VerticalSpace space='medium' />
+            
+            {selectedTextNodes !== 0 ? (
+                <Banner icon={<IconCheckCircle32 />}>
+                    <Text>Create {selectedTextNodes === 1 ? '1 animated text component' : `${selectedTextNodes} animated text components`}</Text>
+                </Banner>
+            ) : (
+                <Banner icon={<IconInfo32 />}>
+                    <Text>Select a text layer to get started</Text>
+                </Banner>
+            )}
+              
             <VerticalSpace space='extraLarge' />
             <Text><Muted>Type by</Muted></Text>
             <VerticalSpace space='medium' />
@@ -70,8 +94,8 @@ function Plugin (props: { greeting: string }) {
                 <Text>Randomize typing speed</Text>
             </Toggle>
             <VerticalSpace space='extraLarge' />
-            <VerticalSpace space='extraLarge' />
-            <Button fullWidth onClick={handleClick}>Create component</Button>
+            <VerticalSpace space='medium' />
+            <Button fullWidth onClick={handleClick} disabled={selectedTextNodes === 0}>Create component</Button>
         </Container>
     )
 }

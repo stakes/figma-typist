@@ -1,15 +1,30 @@
-import { cloneObject, formatErrorMessage, formatSuccessMessage, showUI, once } from '@create-figma-plugin/utilities';
+import { cloneObject, formatErrorMessage, formatSuccessMessage, showUI, once, emit } from '@create-figma-plugin/utilities';
 
 export default async function (): Promise<void> {
 
-  const options = { width: 240, height: 380 }
+  const options = { width: 320, height: 456 }
 
   const speeds = [0.200, 0.100, 0.050, 0.030, 0.010]
 
+  function getTextNodeSelectionCount():number {
+    if (figma.currentPage.selection.length === 0) {
+      return 0
+    }
+    const nodes = figma.currentPage.selection.filter(function (node) {
+      return node.type === 'TEXT'
+    }) as Array<TextNode>
+    return nodes.length
+  }
+
+  figma.on('selectionchange', () => {
+    emit("SELECTIONCHANGE", getTextNodeSelectionCount())
+  })
+
   showUI(options)
+  emit("SELECTIONCHANGE", getTextNodeSelectionCount())
 
   async function handleCreateComponent(data:any) {
-
+    console.log("Create")
     // thanks to https://github.com/yuanqing/figma-plugins for helping start this off
     // if there's no selection, show an error message
     // if the selection isn't text, also show an error message
@@ -17,13 +32,14 @@ export default async function (): Promise<void> {
       figma.closePlugin(formatErrorMessage('Select one or more text layers'))
       return
     }
+    if (getTextNodeSelectionCount() === 0) {
+      figma.closePlugin(formatErrorMessage('No text layers selected'))
+      return
+    }
+
     const nodes = figma.currentPage.selection.filter(function (node) {
       return node.type === 'TEXT'
     }) as Array<TextNode>
-    if (nodes.length === 0) {
-      figma.closePlugin(formatErrorMessage('No text layers in selection'))
-      return
-    }
 
     let componentCount = 0
     
