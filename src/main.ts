@@ -118,7 +118,7 @@ export default async function (): Promise<void> {
     for (let i = 0; i < words.length; i++) {
       let newNode = node.clone()
       newNode.resize(node.width, node.height)
-      newNode.textAutoResize = 'HEIGHT'
+      newNode.textAutoResize = node.textAutoResize
       if (data.type == "word" || data.type == "chunk") {
         newNode.characters = words.slice(0, i + 1).join(' ')
       } else if (data.type == "letter") {
@@ -127,6 +127,7 @@ export default async function (): Promise<void> {
       newNode.x = 0
       newNode.y = 0
       const component = figma.createComponent()
+
       component.resize(newNode.width, newNode.height)
       component.appendChild(newNode)
       newComponents.push(component)
