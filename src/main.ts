@@ -127,10 +127,11 @@ export default async function (): Promise<void> {
       newNode.x = 0
       newNode.y = 0
       const component = figma.createComponent()
-
-      component.resize(newNode.width, newNode.height)
+      component.name = node.characters.slice(0, 20) + (node.characters.length > 20 ? '...' : '');
+      component.resize(newNode.width, newNode.height);
       component.appendChild(newNode)
       newComponents.push(component)
+      console.log(component)
     }
     return newComponents
   }
