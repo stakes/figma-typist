@@ -18,9 +18,10 @@
     "editorType": [
       "figma"
     ],
-    "id": "typist",
+    "id": "1319490058051389789",
     "name": "Typist",
     "main": "src/main.ts",
-    "ui": "src/ui.tsx"
+    "ui": "src/ui.tsx",
+    "networkAccess": {"allowedDomains": ["none"]}
   }
 }
