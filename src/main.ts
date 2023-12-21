@@ -1,10 +1,11 @@
 import { cloneObject, formatErrorMessage, formatSuccessMessage, showUI, once, emit } from '@create-figma-plugin/utilities';
+import { Component } from 'preact';
 
 export default async function (): Promise<void> {
 
   const options = { width: 320, height: 456 }
 
-  const speeds = [0.200, 0.100, 0.050, 0.030, 0.010]
+  const speeds = [0.200, 0.080, 0.030, 0.010, 0.005]
 
   function getTextNodeSelectionCount():number {
     if (figma.currentPage.selection.length === 0) {
@@ -24,7 +25,6 @@ export default async function (): Promise<void> {
   emit("SELECTIONCHANGE", getTextNodeSelectionCount())
 
   async function handleCreateComponent(data:any) {
-    console.log("Create")
     // thanks to https://github.com/yuanqing/figma-plugins for helping start this off
     // if there's no selection, show an error message
     // if the selection isn't text, also show an error message
@@ -52,6 +52,7 @@ export default async function (): Promise<void> {
       bigComponent.layoutMode = 'VERTICAL'
       bigComponent.x = node.x
       bigComponent.y = node.y + node.height + 100
+
       
       // speed randomization stuff
       let iterationCount = 0;
@@ -72,8 +73,6 @@ export default async function (): Promise<void> {
               resetVideoPosition: false
             }]
             let speed = speeds[data.speed];
-            
-            console.log(data.randomize)
             if (data.randomize) {
               // Generate a random percentage between -50% and +50%
               let adjustment = 1 + (Math.random() - 0.8);
@@ -98,9 +97,11 @@ export default async function (): Promise<void> {
               timeout: speed
             }
           }
+          child.name = "Property 1="+i.toString()
           child.reactions = newReactions
         }
       }
+      console.log(bigComponent.componentPropertyDefinitions)
       componentCount++
     }
 
@@ -110,7 +111,7 @@ export default async function (): Promise<void> {
       formatSuccessMessage(
         `Created ${confStr}`
       ))
-    }
+    } 
 
     once('CREATECOMPONENT', handleCreateComponent)
 
@@ -147,7 +148,6 @@ export default async function (): Promise<void> {
       component.resize(newNode.width, newNode.height);
       component.appendChild(newNode)
       newComponents.push(component)
-      console.log(component)
     }
     return newComponents
   }
