@@ -1,0 +1,7 @@
+.sliderTextContainer {
+    display: flex;
+    justify-content: space-between;
+}
+.neutral {
+    background-color: red;
+}
